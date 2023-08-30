@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org"
+                xmlns:sec="www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Post Content</title>
+    <link rel="stylesheet" th:href="@{/css/post.css}" />
+</head>
+<body>
+<a th:href="@{/}">Home</a>
+<div th:unless="${post.isPublished}">
+    <a th:href="@{'/see/drafts'}">Go To Drafts</a>
+</div>
+    <div class="post-container">
+
+        <div class="post">
+            <h2 th:text="${post.title}">Title</h2>
+            <h5 th:if="${post.publishedAt != null}">
+                Published at <span th:text="${#temporals.format(post.publishedAt, 'dd/MM/yyyy, hh:mm a')}"></span>
+                <span th:if="${post.publishedAt < post.updatedAt}"> (Updated at <span th:text="${#temporals.format(post.updatedAt, 'dd/MM/yyyy, hh:mm a')}"></span>)</span>
+            </h5>
+            <h5 th:unless="${post.publishedAt != null}">
+                <span th:if="${post.createdAt != null}">Created at <span th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy, hh:mm a')}"></span></span>
+                <span th:if="${post.updatedAt != null}">Updated at <span th:text="${#temporals.format(post.updatedAt, 'dd/MM/yyyy, hh:mm a')}"></span></span>
+            </h5>
+            <p th:text="${post.excrept}">excrept</p>
+            <p th:text="${post.content}">body text</p>
+
+
+
+
+            <!--            <h2 th:text="${post.title}">Title</h2>-->
+<!--            <h5 th:if="${post.publishedAt != null}" th:text="'Published at ' + ${#temporals.format(post.publishedAt, 'dd/MM/yyyy, hh:mm a')}"></h5>-->
+<!--            <h5 th:unless="${post.publishedAt != null}" th:text="${post.createdAt != null ? 'Created at ' + #temporals.format(post.createdAt, 'dd/MM/yyyy, hh:mm a') : ''}"></h5>-->
+<!--            <h5 th:if="${post.updatedAt != null}" th:text="'Updated at ' + ${#temporals.format(post.updatedAt, 'dd/MM/yyyy, hh:mm a')}"></h5>-->
+<!--            <p th:text="${post.excrept}">excrept</p>-->
+<!--            <p th:text="${post.content}">body text</p>-->
+
+
+            <div class="tag">
+                <div th:each="tag : ${post.tags}">
+                    <strong th:text="'#' + ${tag.tagName}"></strong>
+                </div>
+            </div>
+
+            <span th:text="'Written By '+${post.user.name}"></span>
+            <span th:text="'Updated By '+${post.updatedBy}"></span>
+
+          <div sec:authorize="isAuthenticated()">
+
+              <div class="modify" th:if="${(post.user.email== #authentication.principal.username
+              and post.adminEmail == null)
+              or #authorization.expression('hasRole(''Admin'')')}">
+                  <a th:href="@{'/posts/' + ${post.id} + '/edit'}">Edit</a>
+                  <a th:href="@{'/posts/' + ${post.id} + '/delete'}">Delete</a>
+              </div>
+          </div>
+        </div>
+
+
+    </div>
+
+    <div>
+        <div th:if="${post.isPublished}">
+            <h3>Write Comments</h3>
+            <form  action="#" th:action="@{'/addComment/'+${post.id}}" method="post">
+                <div>
+                    <label for="name">Name</label>
+                    <input id="name" type="text" name="name" required>
+                </div>
+                <div>
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="text" required>
+                </div>
+                <div>
+                    <label for="comment">Comment</label>
+                    <textarea id="comment" name="commentText" required></textarea>
+                </div>
+                <button type="submit">Submit Comment</button>
+            </form>
+        </div>
+
+<!--        <ol>-->
+<!--            <li  th:each="comment:${post.comments}">-->
+<!--                <strong th:text="${comment.name}"></strong> &nbsp; &nbsp;-->
+<!--                <span th:text="${comment.createdAt != null ? 'Created at ' + comment.createdAt : ''}"></span>&nbsp; &nbsp;-->
+<!--&lt;!&ndash;                <span th:text=" ${'Updated at'+ comment.updatedAt ?: ''}"></span>&ndash;&gt;-->
+<!--                <span th:text="${comment.updatedAt != null ? 'Updated at ' + comment.updatedAt : ''}"></span>-->
+<!--                <div th:text="${comment.commentText}"></div> &nbsp; &nbsp;-->
+<!--                <span><a th:href="@{'/editComment/'+${comment.id}}">edit</a></span>-->
+<!--                <span><a th:href="@{'/deleteComment/'+${comment.id}}">Delete</a></span>-->
+<!--            </li>-->
+<!--        </ol>-->
+
+        <div th:if="${post.isPublished}">
+            <ol>
+                <li th:each="comment : ${post.comments}">
+                    <strong th:text="${comment.name}"></strong> &nbsp; &nbsp;
+                    <span th:text="'Created At ' + ${#temporals.format(comment.createdAt, 'dd/MM/yyyy, hh:mm a')}"></span>
+                    <span th:text="${comment.updatedAt != null ? 'Updated at ' + #temporals.format(comment.updatedAt, 'dd/MM/yyyy, hh:mm a') : ''}"></span>
+                    <div th:text="${comment.commentText}"></div> &nbsp; &nbsp;
+                    <div sec:authorize="isAuthenticated()">
+                        <div th:if="${post.user.email== #authentication.principal.username
+              or #authorization.expression('hasRole(''Admin'')')}">
+                            <span><a th:href="@{'/editComment/' + ${comment.id}}">edit</a></span>
+                            <span><a th:href="@{'/deleteComment/' + ${comment.id}}">Delete</a></span>
+                        </div>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <div sec:authorize="isAuthenticated()" >
+
+            <div class="modify" th:if="${post.user.email== #authentication.principal.username
+              or #authorization.expression('hasRole(''Admin'')')}">
+                <div th:unless="${post.isPublished}">
+                    <a th:href="@{'/posts/' + ${post.id} + '/publish'}">Publish</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

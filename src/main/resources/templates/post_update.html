@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Post</title>
+</head>
+<body>
+    <div>
+        <a th:href="@{/}">Home</a>
+        <form action="#"
+              th:action="@{'/posts/{id}'(id=${post.id})}"
+              th:object="${post}"  method="post">
+            <input type="hidden" th:field="*{user}">
+            <input type="hidden" th:field="*{updatedAt}">
+            <h2>Update Post</h2>
+            <div>
+                <label for="new-post-title">Title</label>
+                <input id="new-post-title" type="text" th:field="*{title}" placeholder="Title" th:value="${post.title}" />
+            </div>
+            <div>
+                <label for="excrept-for-new-post">Write excrept</label>
+                <input id="excrept-for-new-post" type="text" th:field="*{excrept}" placeholder="Excrept" th:value="${post.excrept}">
+            </div>
+            <div>
+                <label for="new-post-body">Body</label>
+                <textarea id="new-post-body" th:field="*{content}"  th:text="${post.content}"></textarea>
+            </div>
+
+            <div>
+                <label for="tags-for-new-post">Tag</label>
+                <input type="text" id="tags-for-new-post" name="tagsInput" placeholder="Enter tags..." th:value="${tagString}">
+            </div>
+
+            <input type="submit" value="Update">
+        </form>
+    </div>
+</body>
+</html>

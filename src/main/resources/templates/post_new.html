@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="www.thymeleaf.org/extras/spring-security" >
+<head>
+    <meta charset="UTF-8">
+    <title>New Post</title>
+    <link rel="stylesheet" th:href="@{/css/post.css}" />
+</head>
+<body>
+    <div>
+        <a th:href="@{/}">Home</a>
+        <form
+           action="#"
+           th:action="@{/posts/new}"
+           th:object="${post}"
+           method="post">
+
+          <input type="hidden" th:field="*{user}">
+          <input type="hidden" th:field="*{createdAt}">
+<!--            <input type="hidden" th:field="*{author}">-->
+
+          <h2>Write New Post</h2>
+          <div>
+              <label for="title-for-new-post">Write Tile</label>
+              <input id="title-for-new-post" type="text" th:field="*{title}" placeholder="Title">
+          </div>
+            <div>
+                <label for="excrept-for-new-post">Write excrept</label>
+                <input id="excrept-for-new-post" type="text" th:field="*{excrept}" placeholder="Excrept">
+            </div>
+            <div>
+                <label for="content-for-new-post">Write Content</label>
+                <textarea id="content-for-new-post" type="text" th:field="*{content}"></textarea>
+            </div>
+            <div sec:authorize="hasAnyRole('Author')">
+                <label for="author-for-new-post">Your Name</label>
+                <input id="author-for-new-post" type="text" th:value="${user.name}" placeholder="Your Name" readonly="readonly">
+            </div>
+<!--            <div sec:authorize="hasAnyRole('Admin')">-->
+<!--                <label for="author-for-post">Your Name</label>-->
+<!--                <input id="author-for-post" type="text" th:field="*{author}" placeholder="Your Name">-->
+<!--            </div>-->
+            <div sec:authorize="hasAnyRole('Admin')">
+                <label for="author-for-post">Email</label>
+                <input id="author-for-post" type="text" name="enteredEmail" placeholder="email">
+            </div>
+
+            <!--            <div>-->
+<!--                <label for="author-for-new-post">Your Name</label>-->
+<!--                <input id="author-for-new-post" type="text" th:field="*{author}" placeholder="Your Name">-->
+<!--            </div>-->
+            <div>
+                <label for="tags-for-new-post">Tag</label>
+                <input type="text" id="tags-for-new-post" name="tagsInput" placeholder="Enter tags...">
+            </div>
+<!--            <input type="submit" value="Publish">-->
+<!--            <input type="hidden" name="action" value="saveDraft">-->
+<!--            <button type="submit">Save as Draft</button>-->
+
+<!--            <input type="hidden" name="action" value="publish">-->
+<!--            <button type="submit">Publish</button>-->
+            <button type="submit" name="action" value="publish">Publish</button>
+            <button type="submit" name="action" value="draft">Save in draft</button>
+        </form>
+    </div>
+</body>
+</html>

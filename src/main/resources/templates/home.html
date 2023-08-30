@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="www.thymeleaf.org/extras/spring-security" >
+
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Posts</title>
+<!--    <link rel="stylesheet" th:href="@{/css/home.css}" />-->
+    <style>
+        *{
+    box-sizing: border-box;
+    margin:0px;
+    padding:0px
+}
+
+.search-container{
+display:flex;
+justify-content:space-between;
+padding:10px 50px
+
+}
+.search-form{
+width:30%
+border:1px solid red;
+}
+
+.search-form input{
+width:400px;
+padding:10px;
+border-radius:10px;
+border:none;
+background-color:#D3D3D3;
+}
+.search-form button{
+padding:11px 25px;
+background-color:black;
+color:white;
+border:none;
+border-radius:3px;
+font-weight:800;
+}
+
+.sort-resister{
+display:flex;
+gap:30px
+}
+.sort-resister button{
+padding:11px 25px;
+background-color:black;
+color:white;
+border:none;
+border-radius:3px;
+width:130px;
+font-weight:800;
+}
+.sort-resister a{
+text-decoration:none;
+background-color:black;
+padding:10px 25px;
+color:white;
+border-radius:3px;
+width:130px
+}
+
+.main-container{
+display:flex;
+width:100vw;
+padding:20px;
+}
+
+.filter-container{
+width:15%;
+border:1px solid black;
+height: fit-content;
+padding:20px
+}
+
+.card{
+width:25%;
+display:flex;
+flex-direction:column;
+gap:10px;
+border: 1px solid black;
+margin-top:20px;
+padding:20px
+}
+
+.blog-container{
+
+width:100%;
+padding:20px;
+display:flex;
+justify-content:center;
+flex-flow: row wrap;
+gap:40px
+}
+
+.main-blog-container{
+
+width:80%;
+}
+
+.navigator{
+width:70%;
+align-self:center;
+display:flex;
+justify-content:space-between;
+
+}
+
+.card a{
+text-decoration:none;
+}
+
+.filter-container button{
+padding:11px 25px;
+background-color:black;
+color:white;
+border:none;
+border-radius:3px;
+width:130px;
+font-weight:800;
+
+}
+.tag, .authors{
+margin:10px 0px;
+}
+
+.nav-container{
+display:flex;
+justify-content:center;
+}
+    </style>
+</head>
+<body>
+<div class="search-container">
+    <h2>My Blog Application</h2>
+    <form th:action="@{/search}" method="get" class="search-form">
+        <input type="text" name="query" placeholder="Search for blog posts" th:value="${query}">
+        <input type="hidden" th:value="${userName}" name="userName">
+        <button type="submit">Search</button>
+    </form>
+    <div class="sort-resister">
+        <form th:action="@{/filter}" method="get" class="sort-form">
+            <input type="hidden" th:value="${query}" name="query">
+            <input type="hidden" th:each="author : ${selectedAuthors}" th:value="${author}" name="selectedAuthors">
+            <input type="hidden" th:each="tag : ${selectedTags}" th:value="${tag}" name="selectedTags">
+
+            <input type="hidden" th:each="author : ${authors}" th:value="${author}" name="authors">
+            <input type="hidden" th:each="tag : ${tags}" th:value="${tag}" name="tags">
+
+            <input type="hidden" th:value="${userName}" name="userName">
+
+            <select name="sortOrder" onchange="this.form.submit()">
+                <option value="desc" th:selected="${sortOrder == 'desc'}">New to old</option>
+                <option value="asc" th:selected="${sortOrder == 'asc'}">Old to new</option>
+            </select>
+            <noscript><input type="submit" value="Sort"></noscript>
+        </form>
+        <div sec:authorize="isAnonymous()">
+            <a th:href="@{/resister}">Register</a>
+            <a th:href="@{/login}">Login</a>
+        </div>
+        <div sec:authorize="hasAnyRole('Admin', 'Author')">
+            <a th:href="@{/see/drafts}">See Drafts</a>
+            <a th:href="@{/posts/new}">New Post</a>
+            <a th:href="@{/myPost}">My Posts</a>
+        </div>
+
+        <div sec:authorize="isAuthenticated()">
+            <span sec:authentication="principal.username"></span>
+        </div>
+<!--        <div sec:authorize="isAuthenticated()">-->
+<!--            <span sec:authentication="principal.authorities"></span>-->
+<!--        </div>-->
+
+        <div sec:authorize="isAuthenticated()">
+            <span th:text="${userName}"></span>
+        </div>
+        <div sec:authorize="isAuthenticated()">
+            <form th:action="@{/logout}" method="post">
+                <input type="submit" value="Logout">
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="filter-container">
+        <div th:if="${authors != null or tags != null}">
+            <form action="#" th:action="@{/filter}" method="get">
+                <div>
+                    <h3 >Authors</h3>
+                    <div th:each="author: ${authors}" class="authors">
+                        <div>
+                            <input  type="checkbox" th:value="${author}" name="selectedAuthors"
+                                    onclick="this.form.submit()" th:checked="${selectedAuthors != null and #strings.contains(selectedAuthors, author)}">
+                            <label  th:text="${author}"></label>
+                        </div>
+                    </div>
+
+                    <h3>Tags</h3>
+                    <div th:each="tag: ${tags}" class="tag">
+                        <div>
+                            <input  type="checkbox" th:value="${tag}" name="selectedTags"
+                                    onclick="this.form.submit()" th:checked="${selectedTags != null and #strings.contains(selectedTags, tag)}">
+                            <label  th:text="${tag}"></label>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" th:value="${query}" name="query">
+                <input type="hidden" th:each="author : ${authors}" th:value="${author}" name="authors">
+                <input type="hidden" th:each="tag : ${tags}" th:value="${tag}" name="tags">
+                <input type="hidden" th:value="${userName}" name="userName">
+            </form>
+        </div>
+
+        <form action="#" th:action="@{/filter}" method="get">
+            <h3>Filter by Date</h3>
+            <div>
+                <label for="startDate">Start Date</label>
+                <input id="startDate" type="date" name="startDate">
+            </div>
+            <div>
+                <label for="endDate">End Date</label>
+                <input id="endDate" type="date" name="endDate">
+            </div>
+            <input type="hidden" name="query" th:value="${query}">
+            <input type="submit" value="Filter By Date">
+        </form>
+    </div>
+<!--    <input type="hidden" th:each="author : ${authors}" th:value="${author}" name="authors">-->
+<!--    <input type="hidden" th:each="tag : ${tags}" th:value="${tag}" name="tags">-->
+    <div class="main-blog-container">
+        <div class="blog-container">
+            <div class="card" th:each="post : ${posts}">
+                <h2><a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}">Title</a></h2>
+                <h5 th:text="'Written by ' + ${post.author}">Author Name</h5>
+                <h5 th:text="'Published At ' + ${#temporals.format(post.publishedAt, 'dd/MM/yyyy, hh:mm a')}"></h5>
+                <p th:text="${post.excrept}">excrept</p>
+            </div>
+        </div>
+
+        <div class="nav-container">
+            <div class="navigator">
+                <div>
+                    <a th:if="${currentPage > 1}" th:href="@{|${paginationURL}&pageNo=${currentPage-1}|}">Previous</a>
+                    <span th:unless="${currentPage > 1}">Previous</span>
+                </div>
+                <div>
+                    <a th:if="${currentPage < totalPages}" th:href="@{|${paginationURL}&pageNo=${currentPage+1}|}">Next</a>
+                    <span th:unless="${currentPage < totalPages}">Next</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div th:if="${isHome}">
+    <form action="#" th:action="@{/}" method="get">
+        <input type="hidden" th:value="home" name="home">
+        <input type="submit" value="Go to home">
+    </form>
+</div>
+
+
+</body>
+</html>

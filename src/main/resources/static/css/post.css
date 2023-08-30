@@ -1,0 +1,49 @@
+*{
+    box-sizing: border-box;
+    margin:0px;
+    padding:0px
+}
+
+body{
+padding:50px;
+width:100vw;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
+
+.post-container{
+width:70%;
+
+}
+.post{
+display:flex;
+flex-direction:column;
+gap:10px;
+background-color:whitesmoke;
+padding:20px;
+border:1px solid black;
+}
+.tag{
+display:flex;
+gap:20px;
+}
+.tag strong{
+color:blue
+}
+.modify{
+width:20%;
+display:flex;
+justify-content:space-between;
+}
+
+.modify a{
+text-decoration:none;
+background-color:black;
+color:white;
+}
+#content-for-new-post{
+ width:400px;
+ height:300px;
+}

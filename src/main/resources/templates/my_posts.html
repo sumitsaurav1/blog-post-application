@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="www.thymeleaf.org/extras/spring-security" >
+<head>
+    <meta charset="UTF-8">
+    <title>My Posts</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}"/>
+</head>
+<body>
+<div sec:authorize="isAuthenticated()">
+    <span th:text="${user.name}"></span>
+</div>
+<div class="main-blog-container">
+    <div class="blog-container">
+        <div class="card" th:each="post : ${myPublishedPost}" >
+            <h2><a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}">Title</a></h2>
+            <h5 th:text="'Written by ' + ${post.author}">Author Name</h5>
+            <h5 th:text="'Published At ' + ${#temporals.format(post.publishedAt, 'dd/MM/yyyy, hh:mm a')}"></h5>
+            <p th:text="${post.excrept}">excrept</p>
+        </div>
+    </div>
+    <div class="sort-resister">
+        <a th:href="@{/}">Home</a>
+    </div>
+</div>
+</body>
+</html>

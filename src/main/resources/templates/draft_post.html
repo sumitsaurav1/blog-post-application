@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org"
+                xmlns:sec="www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Draft Post</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}" />
+</head>
+<body>
+<div class="sort-resister">
+    <a th:href="@{/}">Home</a>
+</div>
+<div class="blog-container">
+<!--    <div class="card" th:if="${posts.size() > 0}" th:each="post : ${posts}">-->
+<!--        <h2><a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}">Title</a></h2>-->
+<!--        <h5 th:text="'Written by ' + ${post.author}">Author Name</h5>-->
+<!--        <h5 th:text="'Created At ' + ${#temporals.format(post.createdAt, 'dd/MM/yyyy, hh:mm a')}"></h5>-->
+<!--        <span th:if="${post.updatedAt != null}">Updated at <span th:text="${#temporals.format(post.updatedAt, 'dd/MM/yyyy, hh:mm a')}"></span></span>-->
+<!--        <p th:text="${post.excrept}">excrept</p>-->
+<!--    </div>-->
+    <div sec:authorize="isAuthenticated()">
+<!--        <div class="modify" th:if="${post.user.email== #authentication.principal.username-->
+        <!--              or #authorization.expression('hasRole(''Admin'')')}">-->
+            <div class="card" th:if="${posts.size() > 0}" th:each="post : ${posts}">
+               <div th:if="${post.user.email== #authentication.principal.username
+                     or #authorization.expression('hasRole(''Admin'')')}">
+                   <h2><a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}">Title</a></h2>
+                   <h5 th:text="'Written by ' + ${post.author}">Author Name</h5>
+                   <h5 th:text="'Created At ' + ${#temporals.format(post.createdAt, 'dd/MM/yyyy, hh:mm a')}"></h5>
+                   <span th:if="${post.updatedAt != null}">Updated at <span th:text="${#temporals.format(post.updatedAt, 'dd/MM/yyyy, hh:mm a')}"></span></span>
+                   <p th:text="${post.excrept}">excrept</p>
+               </div>
+            </div>
+<!--        </div>-->
+    </div>
+</div>
+<div th:if="${posts.size() == 0}">
+    <p>Nothing in Draft.</p>
+</div>
+
+</body>
+</html>
